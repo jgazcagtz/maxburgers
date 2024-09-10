@@ -780,7 +780,7 @@
             const orderNotes = document.getElementById('order-notes').value || 'Sin notas adicionales';
             const message = `Número de Orden: ${orderNumber}\nOrden de Hamburguesas:\n${cart.map(item => `${item.name} (${item.quantity}) - $${item.price} c/u`).join('\n')}\nTotal: $${(total + deliveryFee).toFixed(2)}\nMétodo de pago: ${selectedPaymentMethod}\nMétodo de entrega: ${selectedDeliveryMethod}\nDirección de Entrega: ${deliveryAddress}\nDistancia: ${document.getElementById('delivery-distance').value} km\nCosto de Envío: $${deliveryFee.toFixed(2)}\nNotas: ${orderNotes}`;
             const encodedMessage = encodeURIComponent(message);
-            whatsappBtn.href = `https://wa.me/525533355687?text=${encodedMessage}`;
+            whatsappBtn.href = `https://wa.me/523112039300?text=${encodedMessage}`;
             whatsappBtn.style.display = total > 0 ? 'inline-flex' : 'none';
         }
 
