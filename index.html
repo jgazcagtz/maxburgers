@@ -500,9 +500,7 @@
     </div>
     <div class="instructions">
         <p><strong>🍔Teléfono: 3112039300</strong></p>
-       <p><strong>Tepic, Nayarit. México.</strong></p>
-    </div>
-    
+        <p><strong>Tepic, Nayarit. México.</strong></p>
     </div>
 
     <main>
@@ -512,8 +510,6 @@
             <p id="cart-total">Total: $0.00</p>
             <p>🏠Dirección de Entrega:</p>
             <input type="text" id="delivery-address" placeholder="Ingresa tu dirección aquí...">
-            <p>🏍️Distancia de Entrega (km):</p>
-            <input type="number" id="delivery-distance" placeholder="Distancia en km" onchange="updateDeliveryFee()">
             <p>Notas:</p>
             <textarea id="order-notes" placeholder="Agrega notas adicionales..."></textarea>
             <p>Método de Entrega:</p>
@@ -535,10 +531,12 @@
             <p>Pagar con Mercado Pago:</p>
             <a href="https://link.mercadopago.com.mx/segurodeviajes" target="_blank" class="edit-btn">Pagar con Mercado Pago</a>
             <button id="make-order-btn" onclick="uploadOrder()">Enviar pedido 🍔</button>
-            <p><a id="whatsapp-btn" href="#" target="_blank">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"> 
-                Confirmar orden
-              </a></p>
+            <p>
+                <a id="whatsapp-btn" href="#" target="_blank">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"> 
+                    Confirmar orden
+                </a>
+            </p>
             <button class="edit-btn" onclick="toggleModal()">Editar Carrito</button>
             <button id="refresh-btn" onclick="refreshCart()">Iniciar Nuevo Pedido</button>
         </div>
@@ -551,7 +549,7 @@
     </main>
     
     <footer>
-         +Max Burgers &copy;   - Tel. 3112039300
+         +Max Burgers &copy; - Tel. 3112039300
     </footer>
 
     <div id="edit-modal" class="modal">
@@ -593,7 +591,6 @@
         let orderNumber = null;
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let selectedProduct = null;
-        let deliveryFee = 0;
 
         const products = [
             {
@@ -776,38 +773,12 @@
             const whatsappBtn = document.getElementById('whatsapp-btn');
             const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
             const selectedDeliveryMethod = document.querySelector('input[name="delivery-method"]:checked').value;
-            const deliveryAddress = document.getElementById('delivery-address').value || 'No especificada';
-            const orderNotes = document.getElementById('order-notes').value || 'Sin notas adicionales';
-            const message = `Número de Orden: ${orderNumber}\nOrden de Hamburguesas:\n${cart.map(item => `${item.name} (${item.quantity}) - $${item.price} c/u`).join('\n')}\nTotal: $${(total + deliveryFee).toFixed(2)}\nMétodo de pago: ${selectedPaymentMethod}\nMétodo de entrega: ${selectedDeliveryMethod}\nDirección de Entrega: ${deliveryAddress}\nDistancia: ${document.getElementById('delivery-distance').value} km\nCosto de Envío: $${deliveryFee.toFixed(2)}\nNotas: ${orderNotes}`;
+            const deliveryAddress = document.getElementById('delivery-address').value.trim() || 'No especificada';
+            const orderNotes = document.getElementById('order-notes').value.trim() || 'Sin notas adicionales';
+            const message = `Número de Orden: ${orderNumber || 'Pendiente'}\nOrden de Hamburguesas:\n${cart.map(item => `${item.name} (${item.quantity}) - $${item.price} c/u`).join('\n')}\nTotal: $${total.toFixed(2)}\nMétodo de pago: ${selectedPaymentMethod}\nMétodo de entrega: ${selectedDeliveryMethod}\nDirección de Entrega: ${deliveryAddress}\nNotas: ${orderNotes}`;
             const encodedMessage = encodeURIComponent(message);
             whatsappBtn.href = `https://wa.me/523112039300?text=${encodedMessage}`;
             whatsappBtn.style.display = total > 0 ? 'inline-flex' : 'none';
-        }
-
-        function calculateDeliveryFee(distance) {
-            if (distance <= 2) {
-                return 20;
-            } else if (distance <= 5) {
-                return 30;
-            } else {
-                return 30 + (distance - 5) * 5;
-            }
-        }
-
-        function updateDeliveryFee() {
-            const deliveryDistance = parseFloat(document.getElementById('delivery-distance').value) || 0;
-            deliveryFee = calculateDeliveryFee(deliveryDistance);
-
-            const existingDeliveryFee = cart.find(item => item.name === 'Costo de Envío');
-
-            if (existingDeliveryFee) {
-                existingDeliveryFee.price = deliveryFee;
-                existingDeliveryFee.quantity = 1;
-            } else {
-                cart.push({ name: 'Costo de Envío', price: deliveryFee, quantity: 1 });
-            }
-
-            updateCart();
         }
 
         function updateCart() {
@@ -855,8 +826,8 @@
         }
 
         function toggleCart() {
-            const cart = document.getElementById('cart');
-            cart.style.display = cart.style.display === 'none' || cart.style.display === '' ? 'block' : 'none';
+            const cartElement = document.getElementById('cart');
+            cartElement.style.display = cartElement.style.display === 'none' || cartElement.style.display === '' ? 'block' : 'none';
         }
 
         function toggleModal() {
@@ -892,11 +863,10 @@
                 orderNumber = Math.floor(Math.random() * 1000000) + 1;
             }
 
-            const deliveryAddress = document.getElementById('delivery-address').value || 'No especificada';
-            const orderNotes = document.getElementById('order-notes').value || 'Sin notas adicionales';
+            const deliveryAddress = document.getElementById('delivery-address').value.trim() || 'No especificada';
+            const orderNotes = document.getElementById('order-notes').value.trim() || 'Sin notas adicionales';
             const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
             const selectedDeliveryMethod = document.querySelector('input[name="delivery-method"]:checked').value;
-            const deliveryDistance = parseFloat(document.getElementById('delivery-distance').value) || 0;
 
             const orderData = {
                 timestamp: new Date().toLocaleString(),
@@ -905,10 +875,8 @@
                 orderNotes: orderNotes,
                 paymentMethod: selectedPaymentMethod,
                 deliveryMethod: selectedDeliveryMethod,
-                deliveryDistance: deliveryDistance,
-                deliveryFee: deliveryFee.toFixed(2),
                 cart: JSON.stringify(cart),
-                total: (total + deliveryFee).toFixed(2)
+                total: total.toFixed(2)
             };
 
             updateWhatsAppLink(); // Ensure WhatsApp link is updated before sending the order
@@ -998,6 +966,15 @@
                 document.getElementById('menu').appendChild(createProductElement(product, index));
             });
             updateCart(); // Ensure cart is updated on page load
+
+            // Añadir Event Listeners para actualizar WhatsApp en cambios de input
+            document.getElementById('delivery-address').addEventListener('input', updateWhatsAppLink);
+            document.getElementById('order-notes').addEventListener('input', updateWhatsAppLink);
+
+            // Añadir Event Listener para actualizar WhatsApp al hacer clic en el botón
+            document.getElementById('whatsapp-btn').addEventListener('click', function(event) {
+                updateWhatsAppLink();
+            });
         });
 
         setTimeout(() => {
@@ -1026,6 +1003,9 @@
             return menuItem;
         }
     </script>
-  <chat-bot platform_id="5f8946ec-79e4-4e48-b644-8a395fb5a1f3" user_id="1d1891de-e7a0-425c-a900-0e8b28fe9c98" chatbot_id="7d828d40-b3d0-43a9-b102-b16d9aefad89"><a href="https://www.chatsimple.ai/?utm_source=widget&utm_medium=referral">chatsimple</a></chat-bot><script src="https://cdn.chatsimple.ai/chat-bot-loader.js" defer></script>
+    <chat-bot platform_id="5f8946ec-79e4-4e48-b644-8a395fb5a1f3" user_id="1d1891de-e7a0-425c-a900-0e8b28fe9c98" chatbot_id="7d828d40-b3d0-43a9-b102-b16d9aefad89">
+        <a href="https://www.chatsimple.ai/?utm_source=widget&utm_medium=referral">chatsimple</a>
+    </chat-bot>
+    <script src="https://cdn.chatsimple.ai/chat-bot-loader.js" defer></script>
 </body>
 </html>
