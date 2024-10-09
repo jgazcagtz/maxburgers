@@ -5,6 +5,7 @@ let orderNumber = null;
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let selectedProduct = null;
 
+// Complete products array
 const products = [
     {
         "name": "Hamburguesa Clásica",
@@ -70,7 +71,7 @@ const products = [
         "name": "Hot Dog Doble",
         "img": "https://i.imgur.com/e6U889D.png",
         "price": 50,
-        "description": "Acompañado con salchicha de pavo, tira de tocino , jamón, queso amarillo, cebolla, jitomate, lechuga, salsa cátsup, mostaza, aderezo de la casa, crema, mayonesa y picante a elegir."
+        "description": "Acompañado con salchicha de pavo, tira de tocino, jamón, queso amarillo, cebolla, jitomate, lechuga, salsa cátsup, mostaza, aderezo de la casa, crema, mayonesa y picante a elegir."
     },
     {
         "name": "Hot Dog Asadero",
@@ -182,6 +183,28 @@ const products = [
     }
 ];
 
+// Function to create product elements
+function createProductElement(product, index) {
+    const menuItem = document.createElement('div');
+    menuItem.classList.add('menu-item');
+    menuItem.innerHTML = `
+        <img src="${product.img}" alt="${product.name}">
+        <h3>${product.name}</h3>
+        <p>${product.description}</p>
+        <p>$${product.price}</p>
+        <select id="quantity-${index}">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <p><button class="choose-btn" onclick="window.showProductModal(${index})">Elegir</button></p>
+    `;
+    return menuItem;
+}
+
+// Function to update the WhatsApp link
 function updateWhatsAppLink() {
     const whatsappBtn = document.getElementById('whatsapp-btn');
     const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
@@ -194,6 +217,7 @@ function updateWhatsAppLink() {
     whatsappBtn.style.display = total > 0 ? 'inline-flex' : 'none';
 }
 
+// Function to update the cart
 function updateCart() {
     const cartItemsSection = document.getElementById('cart-items');
     const cartTotal = document.getElementById('cart-total');
@@ -224,6 +248,7 @@ function updateCart() {
     updateWhatsAppLink();
 }
 
+// Function to update PayPal form
 function updatePayPalForm() {
     const paypalForm = document.getElementById('paypal-form');
     paypalForm.innerHTML = `
@@ -238,26 +263,31 @@ function updatePayPalForm() {
     `;
 }
 
+// Function to toggle the cart display
 function toggleCart() {
     const cartElement = document.getElementById('cart');
-    cartElement.style.display = cartElement.style.display === 'none' || cartElement.style.display === '' ? 'block' : 'none';
+    cartElement.style.display = (cartElement.style.display === 'none' || cartElement.style.display === '') ? 'block' : 'none';
 }
 
+// Function to toggle the edit modal
 function toggleModal() {
     const modal = document.getElementById('edit-modal');
-    modal.style.display = modal.style.display === 'none' || modal.style.display === '' ? 'block' : 'none';
+    modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'block' : 'none';
 }
 
+// Function to toggle the product modal
 function toggleProductModal() {
     const modal = document.getElementById('product-modal');
-    modal.style.display = modal.style.display === 'none' || modal.style.display === '' ? 'block' : 'none';
+    modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'block' : 'none';
 }
 
+// Function to toggle the promo modal
 function togglePromoModal() {
     const modal = document.getElementById('promo-modal');
-    modal.style.display = modal.style.display === 'none' || modal.style.display === '' ? 'block' : 'none';
+    modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'block' : 'none';
 }
 
+// Function to close modals when clicking outside
 window.onclick = function(event) {
     const modals = [
         document.getElementById('edit-modal'),
@@ -271,6 +301,7 @@ window.onclick = function(event) {
     });
 }
 
+// Function to upload order
 function uploadOrder() {
     if (!orderNumber) {
         orderNumber = Math.floor(Math.random() * 1000000) + 1;
@@ -311,11 +342,13 @@ function uploadOrder() {
     });
 }
 
+// Function to clear the cart
 window.clearCart = function() {
     cart.length = 0;
     updateCart();
 };
 
+// Function to refresh the cart
 window.refreshCart = function() {
     clearCart();
     localStorage.removeItem('cart');
@@ -323,11 +356,13 @@ window.refreshCart = function() {
     document.getElementById('whatsapp-btn').style.display = 'none';
 };
 
+// Function to increase quantity
 window.increaseQuantity = function(index) {
     cart[index].quantity += 1;
     updateCart();
 };
 
+// Function to decrease quantity
 window.decreaseQuantity = function(index) {
     if (cart[index].quantity > 1) {
         cart[index].quantity -= 1;
@@ -337,11 +372,13 @@ window.decreaseQuantity = function(index) {
     updateCart();
 };
 
+// Function to remove cart item
 window.removeCartItem = function(index) {
     cart.splice(index, 1);
     updateCart();
 };
 
+// Function to add product to cart
 window.addProductToCart = function() {
     const existingProduct = cart.find(item => item.name === selectedProduct.name);
 
@@ -356,6 +393,7 @@ window.addProductToCart = function() {
     alert(`Producto agregado al carrito: ${selectedProduct.name} x ${selectedProduct.quantity}`);
 };
 
+// Function to show product modal
 window.showProductModal = function(index) {
     const product = products[index];
     const quantitySelect = document.getElementById(`quantity-${index}`);
@@ -374,44 +412,29 @@ window.showProductModal = function(index) {
     toggleProductModal();
 };
 
+// Event listener for DOMContentLoaded to populate the menu and initialize the cart
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Page loaded, attempting to render products');
     products.forEach((product, index) => {
-        document.getElementById('menu').appendChild(createProductElement(product, index));
+        console.log('Adding product:', product.name);
+        const menuElement = createProductElement(product, index);
+        document.getElementById('menu').appendChild(menuElement);
     });
     updateCart(); // Ensure cart is updated on page load
 
-    // Añadir Event Listeners para actualizar WhatsApp en cambios de input
+    // Add Event Listeners to update WhatsApp link on input changes
     document.getElementById('delivery-address').addEventListener('input', updateWhatsAppLink);
     document.getElementById('order-notes').addEventListener('input', updateWhatsAppLink);
 
-    // Añadir Event Listener para actualizar WhatsApp al hacer clic en el botón
+    // Add Event Listener to update WhatsApp link when clicking the WhatsApp button
     document.getElementById('whatsapp-btn').addEventListener('click', function(event) {
         updateWhatsAppLink();
     });
 });
 
+// Function to pulse the promo button after 10 seconds
 setTimeout(() => {
     const promoBtn = document.getElementById('promo-btn');
     promoBtn.classList.add('pulse');
     setTimeout(() => promoBtn.classList.remove('pulse'), 3000);
 }, 10000);
-
-function createProductElement(product, index) {
-    const menuItem = document.createElement('div');
-    menuItem.classList.add('menu-item');
-    menuItem.innerHTML = `
-        <img src="${product.img}" alt="${product.name}">
-        <h3>${product.name}</h3>
-        <p>${product.description}</p>
-        <p>$${product.price}</p>
-        <select id="quantity-${index}">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-        </select>
-        <p><button class="choose-btn" onclick="window.showProductModal(${index})">Elegir</button></p>
-    `;
-    return menuItem;
-}
